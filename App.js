@@ -28,7 +28,10 @@ export default class App extends Component {
             width: '100%',
             borderBottomWidth: 1,
             borderBottomColor: '#ccc'
-          } }
+          } } 
+          onChangeText={(text) => this.setState({text})}
+          value={this.state.text}
+        />
         <FlatList 
           data={data}
           renderItem={({item}) => { return <Text key={item.key}>{item.str}</Text> } }
