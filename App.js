@@ -60,7 +60,9 @@ export default class App extends Component {
       <View style={ {
           paddingTop: 50,
           flex: 1,
-          justifyContent: 'center',
+          // flexDirection: 'row',
+          // width: '100%',
+          justifyContent: 'space-around',
           alignItems: 'center',
           backgroundColor: '#F5FCFF'
         } }>
