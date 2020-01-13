@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Image, Button, TouchableOpacity, ActivityIndicator, FlatList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform } from 'react-native'
+import { View, Image, Button, TouchableOpacity, ActivityIndicator, FlatList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions } from 'react-native'
 import { WebView } from 'react-native-webview'
 
 export default class App extends Component {
@@ -9,8 +9,21 @@ export default class App extends Component {
       vibrate: false,
       text: '', 
       date: new Date(),
-      position: {}
+      position: {},
+      threads: [],
+      isLoading: true
       }
+  }
+  componentDidMount() {
+    fetch("https://www.reddit.com/r/newsokur/hot.json").then((response) => response.json() )
+      .then((responseJson) => {
+        let threads = responseJson.data.children
+        threads = threads.map(i => {
+          i.key = i.data.url
+          return i
+        })
+        this.setState({threads:threads, isLoading: false})
+      }).catch((error) => console.warn(error) )
   }
   async openDatePickerAndroid() {
     try {
@@ -43,6 +56,8 @@ export default class App extends Component {
     console.warn('pressed!!!')
   }
   render() {
+    const {threads, isLoading} = this.state
+    const { width } = Dimensions.get('window')
     const {position} = this.state
     const data = [
       {str:'GuidovanRossum',key:'Guido'},
@@ -66,7 +81,24 @@ export default class App extends Component {
           alignItems: 'center',
           backgroundColor: '#F5FCFF'
         } }>
-          <Text>
+          {isLoading ?
+          <ActivityIndicator /> :
+          <FlatList 
+            data={threads}
+            renderItem={({item}) => {
+              return (
+                <View>
+                  <Text>
+                    {item.data.title}
+                  </Text>
+                </View>
+              )
+            }}
+            />
+          }
+      </View>
+
+          /* <Text>
             {`${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`}
           </Text>
 
@@ -78,8 +110,7 @@ export default class App extends Component {
             mode={'date' || 'time' || 'datetime'}
             /> : <Button onPress={() => this.openDatePickerAndroid()} title={'日にちを選ぶ'} />
            }
-        <Button onPress={() => this.openShare()} title={'シェアを開く'} />
-      </View>
+        <Button onPress={() => this.openShare()} title={'シェアを開く'} /> */
       //   <TextInput
       //     style={ {
       //       width: '100%',
