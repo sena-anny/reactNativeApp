@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Image, Button, TouchableOpacity, ActivityIndicator, FlatList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions } from 'react-native'
+import { View, Image, Button, TouchableOpacity, ActivityIndicator, FlatList, SectionList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions, Modal } from 'react-native'
 import { WebView } from 'react-native-webview'
 
 export default class App extends Component {
@@ -11,19 +11,58 @@ export default class App extends Component {
       date: new Date(),
       position: {},
       threads: [],
-      isLoading: true
+      isLoading: true,
+      isVisible: false
       }
   }
+  showModal() {
+    this.setState({isVisible: true})
+  }
+  closeModal() {
+    this.setState({isVisible: false})
+  }
   componentDidMount() {
-    fetch("https://www.reddit.com/r/newsokur/hot.json").then((response) => response.json() )
-      .then((responseJson) => {
-        let threads = responseJson.data.children
-        threads = threads.map(i => {
+    this.fetchThreds()
+    // fetch("https://www.reddit.com/r/newsokur/hot.json").then((response) => response.json() )
+    //   .then((responseJson) => {
+    //     let threads = responseJson.data.children
+    //     threads = threads.map(i => {
+    //       i.key = i.data.url
+    //       return i
+    //     })
+    //     this.setState({threads:threads, isLoading: false})
+    //   }).catch((error) => console.warn(error) )
+  }
+  _fetchThreads(item) {
+    return new Promise((resolve, reject) => {
+      fetch(item.uri).then((response) => response.json())
+        .then((responseJson) => {
+          let threads = responseJson.data.children.slice(0,5)
+          threads = threads.map(i => {
           i.key = i.data.url
           return i
         })
-        this.setState({threads:threads, isLoading: false})
-      }).catch((error) => console.warn(error) )
+        return resolve({data:threads, title: item.title})
+        }).catch((error) => reject(error) )
+    })
+  }
+  fetchThreds() {
+    let list = [
+      {
+        uri: "https://www.reddit.com/r/newsokur/hot.json",
+        title: '人気'
+      },
+      {
+        uri: "https://www.reddit.com/r/newsokur/controversial.json",
+        title: '議論中'
+      }
+    ]
+    Promise.all(list.map(i => this._fetchThreads(i)))
+      .then(r => {
+        this.setState({threads: r, isLoading: false})
+      }).catch(e => {
+        console.warn(e)
+      })
   }
   async openDatePickerAndroid() {
     try {
@@ -77,24 +116,46 @@ export default class App extends Component {
           flex: 1,
           // flexDirection: 'row',
           // width: '100%',
-          justifyContent: 'space-around',
+          justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: '#F5FCFF'
         } }>
+          {/* <Modal visible={this.state.isVisible} 
+            transparent={false}
+            animationType={'slide' || 'fade'}
+            presentationStyle={'fullScreen' || 'pageSheet' || 'formSheet' || 'overFullScreen'}
+            >
+              <View style={{ flex: 1,justifyContent: 'center',alignItems: 'center',backgroundColor: '#F5FCFF'}}>
+                <Button onPress={()=>this.closeModal()} title="close modal" /> 
+              </View>
+            </Modal>
+            <Button onPress={()=>this.showModal()} title="show modal" /> */}
           {isLoading ?
           <ActivityIndicator /> :
-          <FlatList 
-            data={threads}
-            renderItem={({item}) => {
+          <SectionList 
+            renderItem={thread => {
               return (
-                <View>
-                  <Text>
-                    {item.data.title}
-                  </Text>
+                <View style={{flex:1,flexDirection:'row',width:"100%"}}>
+                  <Image style={{width:50, height:50 }} source={{uri: thread.item.data.thumbnail}} />
+                  <Text style={{width:width - 50}}key={thread.key}>{thread.item.data.title}</Text>
                 </View>
               )
             }}
+            renderSectionHeader={({section}) => <Text>{section.title}</Text>}
+            sections = {threads}
             />
+          // <FlatList 
+          //   data={threads}
+          //   renderItem={({item}) => {
+          //     return (
+          //       <View>
+          //         <Text>
+          //           {item.data.title}
+          //         </Text>
+          //       </View>
+          //     )
+          //   }}
+          //   />
           }
       </View>
 
