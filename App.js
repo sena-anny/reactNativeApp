@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { View, Image, ImageStore, ImageEditor, Button, TouchableOpacity, ActivityIndicator, FlatList, SectionList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions, Modal } from 'react-native'
+import { View, Image, ImageStore, Button, TouchableOpacity, ActivityIndicator, FlatList, SectionList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions, Modal } from 'react-native'
+import ImageEditor from "@react-native-community/image-editor"
 import { WebView } from 'react-native-webview'
 
 export default class App extends Component {
@@ -7,7 +8,7 @@ export default class App extends Component {
     super()
     this.state = { 
       position: {},
-      uri: '',
+      uri: "",
       vibrate: false,
       text: '', 
       date: new Date(),
@@ -77,7 +78,7 @@ export default class App extends Component {
             source={require('./assets/sample.png')}
           />
           <Button onPress={() => {
-            this.cropImage('https://www.tabikobo.com/world_heritage/mont_saint_michel/images/main1.jpg')}}
+            this.cropImage('https://1.bp.blogspot.com/-s7wD--x4LBo/WUJZO318J0I/AAAAAAABE1k/cLyYpUhHxzou8EfHWbcd02LpnTfHU006gCLcBGAs/s1600/logo_sml.png')}}
             title={"crop a picture."}
           />
       </View>

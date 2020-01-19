@@ -9,3 +9,10 @@ react-native run-android
 ```
 react-native run-ios
 ```
+
+新しいモジュールを追加する
+```
+npm install module名
+cd ios
+pod install
+```
