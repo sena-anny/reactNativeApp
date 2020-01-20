@@ -1,7 +1,73 @@
 import React, { Component } from 'react'
-import { View, Image, ImageStore, Button, TouchableOpacity, ActivityIndicator, FlatList, SectionList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions, Modal } from 'react-native'
+import { View, Image, ImageStore, Button, AsyncStorage, TouchableOpacity, ActivityIndicator, FlatList, SectionList, Text, TextInput, DatePickerIOS, DatePickerAndroid, Share, Platform, Dimensions, Modal } from 'react-native'
 import ImageEditor from "@react-native-community/image-editor"
 import { WebView } from 'react-native-webview'
+
+
+class Archive extends Component {
+  static navigationOptions = {
+    title: 'ストックした記事',
+    headerTintColor:'white',
+    headerBackTitleStyle:{color:'white'},
+    headerStyle:{backgroundColor:"#00aced"},
+  }
+  constructor(){
+    super()
+    this.state = {threads:[]}}
+    componentDidMount() {
+      this.getData()
+    }
+    getData(){ 
+      AsyncStorage.getAllKeys((err,keys) => {
+        if(err){
+          console.error(err)
+          return false
+        } else {
+          AsyncStorage.multiGet(keys, (err,data) => {
+            threads=data.map((i) => { 
+              returnJSON.parse(i[1])
+            })
+            this.setState({threads})
+            return true
+          })
+        }
+      })
+    }
+    render() {
+      const {threads}=this.state
+      const {width}=Dimensions.get('window')
+      return (
+        <View style={{flex:1,flexDirection:'row',width:'100%',}}>
+          <FlatList data={threads}
+            renderItem={({item})=>{
+            return (
+              <View style={{flex:1,flexDirection:'row',width:'100%',borderBottomWidth:2,borderColor:'#f5f5f5'}}>
+                <Image style={{width:50,height:50}}
+                       source={{uri:item.thumbnail}}
+                />
+                <View style={{width: width - 50}}>
+                  <View style={{flex:1,flexDirection:'column'}}>
+                    <Text style={{color:'#000'}}>{item.title}</Text>
+                    <Text style={{color:'#ababab',fontSize:10}}>{item.domain}</Text>
+                  </View>
+                </View>
+              </View>
+            )
+            }}
+           />
+          </ View>
+        )
+    }
+}
+
+
+
+
+
+
+
+
+
 
 export default class App extends Component {
   constructor() {
